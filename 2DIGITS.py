@@ -22,10 +22,10 @@ for txt in data:
     for i in range(int(len(text)/5)):
         despl = i*5
         tag = tags[int(text[0+despl])]
-        left = (float(text[1+despl])*w)-(float(text[3+despl])/2)
-        top = (float(text[2+despl])*h)-(float(text[4+despl])/2)
-        right = (float(text[1+despl])*w)+(float(text[3+despl])/2)
-        bottom = (float(text[2+despl])*h)+(float(text[4+despl])/2)
+        left = (float(text[1+despl])*w)-(float(text[3+despl]*w)/2)
+        top = (float(text[2+despl])*h)-(float(text[4+despl]*h)/2)
+        right = (float(text[1+despl])*w)+(float(text[3+despl]*w)/2)
+        bottom = (float(text[2+despl])*h)+(float(text[4+despl]*h)/2)
         out.write(str(tag) + " 0 " + "0 " + "0 " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom)
                   + " 0 " + "0 " + "0 " + "0 " + "0 " + "0 " + "0" + "\n")
     f.close()
