@@ -16,7 +16,7 @@ for i in range(len(URL_carpetas)):
     for img in data:
         if cont == 0:
             frame = cv2.imread(os.path.join(URL_carpetas[i], img))
-            cv2.imwrite(os.path.join(URL_output,img), frame)
+            cv2.imwrite(os.path.join(URL_output, img), frame)
             cont = 3
         cont = cont - 1
 
@@ -26,6 +26,6 @@ for j in range(len(URL_carpetas_SVOs)):
     for img in data:
         if cont == 0:
             frame = cv2.imread(os.path.join(URL_carpetas_SVOs[j], img))
-            cv2.imwrite(os.path.join(URL_output,img), frame)
+            cv2.imwrite(os.path.join(URL_output, img), frame)
             cont = 4
         cont = cont - 1

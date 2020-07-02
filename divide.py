@@ -3,14 +3,14 @@ import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-images_URL = "../Datasets/dataset_CAPO/"
-labels_URL = "../Datasets/DIGITS/"
+images_URL = "../Datasets/augmentation/images/"
+labels_URL = "../Datasets/augmentation/labels/"
 
-test_images_URL = "../Datasets/test/images/"
-test_labels_URL = "../Datasets/test/labels/"
+test_images_URL = "../Datasets/data_3/test/images/"
+test_labels_URL = "../Datasets/data_3/test/labels/"
 
-train_images_URL = "../Datasets/train/images/"
-train_labels_URL = "../Datasets/train/labels/"
+train_images_URL = "../Datasets/data_3/train/images/"
+train_labels_URL = "../Datasets/data_3/train/labels/"
 
 p_train = 0.8
 
@@ -19,10 +19,10 @@ data = os.listdir(labels_URL)
 train, test = train_test_split(data, test_size=0.30, random_state=23)
 
 for tr in train:
-    if tr.split('_')[0] == 'ITALIA':
+    """if tr.split('_')[0] == 'ITALIA':
         img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.jpg'))
-    else:
-        img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
+    else:"""
+    img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
 
     cv2.imwrite(os.path.join(train_images_URL, tr.split('.')[0]+'.png'), img)
 
@@ -35,10 +35,10 @@ for tr in train:
     out.close()
 
 for te in test:
-    if te.split('_')[0] == 'ITALIA':
+    """if te.split('_')[0] == 'ITALIA':
         img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.jpg'))
-    else:
-        img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
+    else:"""
+    img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
 
     cv2.imwrite(os.path.join(test_images_URL, te.split('.')[0]+'.png'), img)
 
