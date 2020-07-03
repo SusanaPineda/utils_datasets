@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import cv2
+import matplotlib.pyplot as plt
 
 URL_ground_truth = "../Datasets/validacion_semaforos/labels/"
 URL_results = "../Datasets/validacion_semaforos/labels_results/"
@@ -30,13 +31,21 @@ def get_info(file, im, str):
             left = float(text[2 + despl])
             width = float(text[3 + despl]) - top
             height = float(text[4 + despl]) - left
-            cn = (left+width/2, top+height/2)
+            cn = (top+height/2, left+width/2)
 
         cl.append(tag)
         center.append(cn)
 
     return cl, center
 
+def paint_detections(pr, pgt, im):
+    for p in pr:
+        cv2.circle(im, (int(p[0]), int(p[1])), 3, (255, 0, 0), 2)
+    for g in pgt:
+        cv2.circle(im, (int(g[0]), int(g[1])), 3, (0, 0, 255), 2)
+
+    cv2.imshow("compare", im)
+    cv2.waitKey(0)
 
 def compare(cl_r, ps_r, cl_gt, ps_gt):
     class_results_copy = cl_r.copy()
@@ -83,6 +92,7 @@ def compare(cl_r, ps_r, cl_gt, ps_gt):
 
 data = os.listdir(URL_ground_truth)
 total_matrix = np.zeros((8, 8))
+vis = False
 
 for d in data:
     results = open(os.path.join(URL_results, d))
@@ -96,7 +106,14 @@ for d in data:
     class_results, positions_results = get_info(results, img, "results")
     class_gt, positions_gt = get_info(gt, img, "gt")
 
+    if vis:
+        paint_detections(positions_results, positions_gt, img.copy())
+
     matrix = compare(class_results, positions_results, class_gt, positions_gt)
 
     total_matrix = total_matrix + matrix
-print(total_matrix)
+
+plt.matshow(total_matrix)
+plt.colorbar()
+plt.show()
+#print(total_matrix)

@@ -1,8 +1,8 @@
 import os
 import cv2
 
-input_URL_images = "/home/susi/Documents/Datasets/validacion_semaforos/images"
-input_URL_labels = "/home/susi/Documents/Datasets/validacion_semaforos/labels_results"
+input_URL_images = "/home/susi/Documents/Datasets/validacion_semaforos/images_2"
+input_URL_labels = "/home/susi/Documents/Datasets/validacion_semaforos/results_firstDataset_lastNet"
 
 
 def get_labels(file, img):
@@ -25,11 +25,12 @@ data = os.listdir(input_URL_labels)
 
 for d in data:
     file = open(os.path.join(input_URL_labels, d))
+    print(file)
 
-    if len(d.split('.')[0].split('_')) == 3:
+    '''if len(d.split('.')[0].split('_')) == 3:
         img = cv2.imread(os.path.join(input_URL_images, d.split('.')[0] + ".jpg"))
-    else:
-        img = cv2.imread(os.path.join(input_URL_images, d.split('.')[0] + ".png"))
+    else:'''
+    img = cv2.imread(os.path.join(input_URL_images, d.split('.')[0] + ".png"))
 
     get_labels(file, img)
 
