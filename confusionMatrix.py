@@ -3,9 +3,9 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "../Datasets/validacion_semaforos/labels/"
-URL_results = "../Datasets/validacion_semaforos/labels_results/"
-URL_images = "../Datasets/validacion_semaforos/images/"
+URL_ground_truth = "../Datasets/validacion_semaforos/labels_2/"
+URL_results = "../Datasets/validacion_semaforos/results_firstDataset_lastNet/"
+URL_images = "../Datasets/validacion_semaforos/images_2/"
 
 
 def get_info(file, im, str):
@@ -48,44 +48,37 @@ def paint_detections(pr, pgt, im):
     cv2.waitKey(0)
 
 def compare(cl_r, ps_r, cl_gt, ps_gt):
-    class_results_copy = cl_r.copy()
-    class_gt_copy = cl_gt.copy()
-    cont = 0
-
+    i = 0
+    cont = len(cl_gt)
     sums = np.zeros((8, 8))
-    if len(cl_r) > 0:
-        for i in range(len(cl_gt)):
-            np_pos = np.asarray(ps_gt[i])
-            diff = np.absolute(np.subtract(ps_r, np_pos))
-            dis_min = np.where(diff == np.amin(diff))
 
-            cl_gth = cl_gt[i]
+    while (len(cl_r) > 0) & (len(cl_gt) > 0) & (cont > 0):
+        cont = cont-1
+        np_pos = np.asarray(ps_gt[i])
+        #diff = np.absolute(np.subtract(ps_r, np_pos))
+        diff = [np.linalg.norm(np.asarray(x) - np_pos) for x in list(ps_r)]
+        dis_min = np.argmin(diff)
+        #dis_min = int(dis_min/2)
 
-            if (len(class_gt_copy) > 0) & (len(class_results_copy) > 0):
-                if dis_min[0].size == 1:
-                    cl_res = cl_r[dis_min[0][0]]
-                    dist = np.linalg.norm(np.asarray(ps_r[dis_min[0][0]]) - np_pos)
-                    if dist < 90:
-                        sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
-                        class_results_copy = np.delete(class_results_copy, dis_min[0][0] - cont)
-                        class_gt_copy = np.delete(class_gt_copy, i - cont)
-                        cont = cont + 1
-                else:
-                    cl_res = cl_r[dis_min[0][1]]
-                    dist = np.linalg.norm(np.asarray(ps_r[dis_min[0][1]]) - np_pos)
-                    if dist < 90:
-                        sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
-                        class_results_copy = np.delete(class_results_copy, dis_min[0][1] - cont)
-                        class_gt_copy = np.delete(class_gt_copy, i - cont)
-                        cont = cont + 1
+        cl_gth = cl_gt[i]
+        cl_res = cl_r[dis_min]
+        dist = diff[dis_min]
+        if dist < 90:
+            sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
+            cl_r = np.delete(cl_r, dis_min)
+            cl_gt = np.delete(cl_gt, i)
+            ps_r = np.delete(ps_r, dis_min, 0)
+            ps_gt = np.delete(ps_gt, i, 0)
+        else:
+            i = i+1
 
-    while len(class_gt_copy) > 0:
-        sums[7][class_gt_copy[0]] = sums[7][class_gt_copy[0]] + 1
-        class_gt_copy = np.delete(class_gt_copy, 0)
+    while len(cl_gt) > 0:
+        sums[7][cl_gt[0]] = sums[7][cl_gt[0]] + 1
+        cl_gt = np.delete(cl_gt, 0)
 
-    while len(class_results_copy) > 0:
-        sums[class_results_copy[0]][6] = sums[class_results_copy[0]][6] + 1
-        class_results_copy = np.delete(class_results_copy, 0)
+    while len(cl_r) > 0:
+        sums[cl_r[0]][6] = sums[cl_r[0]][6] + 1
+        cl_r = np.delete(cl_r, 0)
 
     return sums
 
@@ -98,10 +91,10 @@ for d in data:
     results = open(os.path.join(URL_results, d))
     gt = open(os.path.join(URL_ground_truth, d))
 
-    if len(d.split('.')[0].split('_')) == 3:
+    '''if len(d.split('.')[0].split('_')) == 3:
         img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".jpg"))
-    else:
-        img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".png"))
+    else:'''
+    img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".png"))
 
     class_results, positions_results = get_info(results, img, "results")
     class_gt, positions_gt = get_info(gt, img, "gt")
@@ -109,11 +102,13 @@ for d in data:
     if vis:
         paint_detections(positions_results, positions_gt, img.copy())
 
-    matrix = compare(class_results, positions_results, class_gt, positions_gt)
+    matrix = compare(class_results.copy(), positions_results.copy(), class_gt.copy(), positions_gt.copy())
 
     total_matrix = total_matrix + matrix
 
 plt.matshow(total_matrix)
 plt.colorbar()
+plt.xlabel("groundTruth")
+plt.ylabel("results")
 plt.show()
-#print(total_matrix)
+
