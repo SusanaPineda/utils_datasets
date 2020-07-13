@@ -3,25 +3,28 @@ import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-images_URL = "../Datasets/augmentation/images/"
-labels_URL = "../Datasets/augmentation/labels/"
+images_URL = "../Datasets/data_5/TestyTrain/images/"
+labels_URL = "../Datasets/data_5/TestyTrain/labels/"
 
-test_images_URL = "../Datasets/data_3/test/images/"
-test_labels_URL = "../Datasets/data_3/test/labels/"
+test_images_URL = "../Datasets/data_5/test/images/"
+test_labels_URL = "../Datasets/data_5/test/labels/"
 
-train_images_URL = "../Datasets/data_3/train/images/"
-train_labels_URL = "../Datasets/data_3/train/labels/"
+train_images_URL = "../Datasets/data_5/train/images/"
+train_labels_URL = "../Datasets/data_5/train/labels/"
 
-p_train = 0.8
+#p_train = 0.8
 
 data = os.listdir(labels_URL)
 
-train, test = train_test_split(data, test_size=0.30, random_state=23)
+train, test = train_test_split(data, test_size=0.3, random_state=23)
 
 for tr in train:
-    """if tr.split('_')[0] == 'ITALIA':
-        img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.jpg'))
-    else:"""
+    '''if (tr.split('_')[0] == 'ITALIA') or (tr.split('_')[0] == 'BG') or (tr.split('_')[0] == 'Mad'):
+        if (tr.split('_')[0] == 'ITALIA') & (tr.split('_')[1] == 'AU'):
+            img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
+        else:
+            img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.jpg'))
+    else:'''
     img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
 
     cv2.imwrite(os.path.join(train_images_URL, tr.split('.')[0]+'.png'), img)
@@ -35,9 +38,12 @@ for tr in train:
     out.close()
 
 for te in test:
-    """if te.split('_')[0] == 'ITALIA':
-        img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.jpg'))
-    else:"""
+    '''if (te.split('_')[0] == 'ITALIA') or (te.split('_')[0] == 'BG') or (te.split('_')[0] == 'Mad'):
+        if (te.split('_')[0] == 'ITALIA') & (te.split('_')[1] == 'AU'):
+            img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
+        else:
+            img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.jpg'))
+    else:'''
     img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
 
     cv2.imwrite(os.path.join(test_images_URL, te.split('.')[0]+'.png'), img)

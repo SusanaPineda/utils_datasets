@@ -3,9 +3,9 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "../Datasets/validacion_semaforos/labels_2/"
-URL_results = "../Datasets/validacion_semaforos/Detect_Semaphore_dataset5_000008_098_600/"
-URL_images = "../Datasets/validacion_semaforos/images_2/"
+URL_ground_truth = "../Datasets/data_5/val/labels_YOLO/"
+URL_results = "../Datasets/validacion_semaforos/Detect_semaphore_dataset7_00006_2_3_0995_340_newclass/"
+URL_images = "../Datasets/data_5/val/images/"
 
 
 def get_info(file, im, str):
