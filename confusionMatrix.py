@@ -3,10 +3,13 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "../Datasets/data_5/val/labels_YOLO/"
-URL_results = "../Datasets/validacion_semaforos/Detect_semaphore_dataset7_00006_2_3_0995_340_newclass/"
-URL_images = "../Datasets/data_5/val/images/"
+URL_ground_truth = "../Datasets/val_TFM/2clases/labels_YOLO/"
+URL_results = "../Datasets/val_TFM/2class_2D/"
+URL_images = "../Datasets/val_TFM/images/"
 
+"""URL_ground_truth = "../Datasets/val_5/labels_YOLO/"
+URL_results = "../Datasets/validacion_semaforos/Detect_semaphore_dataset7_00006_2_3_0995_340_newclass/"
+URL_images = "../Datasets/val_5/images/" """
 
 def get_info(file, im, str):
     cl = []
@@ -142,5 +145,6 @@ plt.ylabel("results")
 # plt.title("Detect_semaphore_dataset5_00005_2_3_0995_600")
 plt.show()
 
-labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+labels = np.array(['Peaton', 'Coche'])
+#labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
 get_numbers(total_matrix, labels)

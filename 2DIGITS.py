@@ -1,9 +1,9 @@
 import os
 import cv2
 
-URL_output = "../Datasets/VAL_CAPO/labels_DIGITS/"
-URL_YOLO = "../Datasets/VAL_CAPO/labels_YOLO/"
-URL_IMGs = "../Datasets/VAL_CAPO/images/"
+URL_output = "../Datasets/Youtube/labels_DIGITS/"
+URL_YOLO = "../Datasets/Youtube/labels_YOLO/"
+URL_IMGs = "../Datasets/Youtube/images/"
 data = os.listdir(URL_YOLO)
 
 tags = ['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico']
@@ -12,11 +12,11 @@ for txt in data:
     """if txt.split('_')[0] == 'ITALIA':
         img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + '.jpg'))
     else:
-        img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0]+'.png'))"""
+        img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0]+'.png'))
     if len(txt.split('.')[0].split('_')) == 3:
         img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + ".jpg"))
-    else:
-        img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + ".png"))
+    else:"""
+    img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + ".png"))
 
     h = img.shape[0]
     w = img.shape[1]

@@ -13,19 +13,16 @@ train_images_URL = "../Datasets/data_5/train/images/"
 train_labels_URL = "../Datasets/data_5/train/labels/"
 
 #p_train = 0.8
+cont = 20
 
 data = os.listdir(labels_URL)
 
 train, test = train_test_split(data, test_size=0.3, random_state=23)
 
 for tr in train:
-    '''if (tr.split('_')[0] == 'ITALIA') or (tr.split('_')[0] == 'BG') or (tr.split('_')[0] == 'Mad'):
-        if (tr.split('_')[0] == 'ITALIA') & (tr.split('_')[1] == 'AU'):
-            img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
-        else:
-            img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.jpg'))
-    else:'''
     img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.png'))
+    if img is None:
+        img = cv2.imread(os.path.join(images_URL, tr.split('.')[0] + '.jpg'))
 
     cv2.imwrite(os.path.join(train_images_URL, tr.split('.')[0]+'.png'), img)
 
@@ -38,12 +35,6 @@ for tr in train:
     out.close()
 
 for te in test:
-    '''if (te.split('_')[0] == 'ITALIA') or (te.split('_')[0] == 'BG') or (te.split('_')[0] == 'Mad'):
-        if (te.split('_')[0] == 'ITALIA') & (te.split('_')[1] == 'AU'):
-            img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
-        else:
-            img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.jpg'))
-    else:'''
     img = cv2.imread(os.path.join(images_URL, te.split('.')[0] + '.png'))
 
     cv2.imwrite(os.path.join(test_images_URL, te.split('.')[0]+'.png'), img)

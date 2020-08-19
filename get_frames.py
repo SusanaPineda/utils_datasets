@@ -15,14 +15,17 @@ etiqueta = args['etiqueta']
 
 cap = cv2.VideoCapture(inputURL)
 cont = 0
+cont2 = 20
 while(cap.isOpened()):
     ret, frame = cap.read()
     if ret == True:
-        cv2.imshow("frame", frame)
-        name = os.path.join(outputURL, etiqueta)
-        cv2.imwrite(name+str(cont)+".png", frame)
-        cont = cont+1
-
+        if cont2 == 0:
+            cv2.imshow("frame", frame)
+            name = os.path.join(outputURL, etiqueta)
+            cv2.imwrite(name+str(cont)+".png", frame)
+            cont = cont+1
+            cont2 = 20
+        cont2 = cont2-1
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
