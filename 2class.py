@@ -2,10 +2,10 @@ import os
 import cv2
 import numpy as np
 
-URL_output_DIGITS_labels = "../Datasets/data_2/train/labels_2/"
+URL_output_DIGITS_labels = "/home/susi/Documents/Datasets/data_8/val/labels_2class/"
 #URL_output_YOLO_labels = ""
 
-URL_input_DIGITS_labels = "../Datasets/data_2/train/labels/"
+URL_input_DIGITS_labels = "/home/susi/Documents/Datasets/data_8/val/labels_DIGITS/"
 #URL_input_YOLO_labels = ""
 
 data_DIGITS = os.listdir(URL_input_DIGITS_labels)

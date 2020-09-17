@@ -2,18 +2,19 @@ import os
 import cv2
 import numpy as np
 
-URL_output = "../Datasets/complete/labels_YOLO/"
-URL_DIGITS = "../Datasets/complete/labels_DIGITS/"
-URL_IMGs = "../Datasets/complete/images/"
+URL_output = "/home/susi/Documents/Datasets/data_8/train/labels_1class_YOLO/"
+URL_DIGITS = "/home/susi/Documents/Datasets/data_8/train/labels_1class/"
+URL_IMGs = "/home/susi/Documents/Datasets/data_8/train/images/"
 data = os.listdir(URL_DIGITS)
 
-tags = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+#tags = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+#tags = np.array(['Peaton', 'Coche'])
+tags = np.array(['Semaforo'])
 
 for txt in data:
     img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + ".png"))
     if img is None:
         img = cv2.imread(os.path.join(URL_IMGs, txt.split('.')[0] + ".jpg"))
-
     h = img.shape[0]
     w = img.shape[1]
     f = open(os.path.join(URL_DIGITS, txt))

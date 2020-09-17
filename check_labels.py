@@ -1,8 +1,8 @@
 import os
 import cv2
 
-input_URL_images = "/home/susi/Documents/Datasets/val_4/images"
-input_URL_labels = "/home/susi/Documents/Datasets/val_4/labels_DIGITS"
+input_URL_images = "/home/susi/Documents/Datasets/val1_resize640/images/"
+input_URL_labels = "/home/susi/Documents/Datasets/val1_resize640/labels/"
 
 
 def get_labels(file, img):

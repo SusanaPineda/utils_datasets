@@ -1,8 +1,8 @@
 import os
 import numpy as np
 
-URLs_labels = ["/media/susi/B48C43F88C43B420/Datasets/data_5/test/labels/", "/media/susi/B48C43F88C43B420/Datasets/data_5/train/labels/", "/media/susi/B48C43F88C43B420/Datasets/data_5/val_5/labels/"]
-URL_output = "/media/susi/B48C43F88C43B420/Datasets/data_5/"
+URLs_labels = ["/home/susi/Documents/Datasets/data_8/val/labels_DIGITS/"]
+URL_output = "/home/susi/Documents/Datasets/data_8/val/"
 tags = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
 
 count = np.zeros(len(tags))

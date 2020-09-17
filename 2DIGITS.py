@@ -1,9 +1,9 @@
 import os
 import cv2
 
-URL_output = "../Datasets/Youtube/labels_DIGITS/"
-URL_YOLO = "../Datasets/Youtube/labels_YOLO/"
-URL_IMGs = "../Datasets/Youtube/images/"
+URL_output = "/home/susi/Documents/Datasets/val2/labels/"
+URL_YOLO = "/home/susi/Documents/Datasets/val2/labels_YOLO/"
+URL_IMGs = "/home/susi/Documents/Datasets/val2/images/"
 data = os.listdir(URL_YOLO)
 
 tags = ['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico']

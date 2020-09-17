@@ -3,13 +3,10 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "../Datasets/val_TFM/2clases/labels_YOLO/"
-URL_results = "../Datasets/val_TFM/2class_2D/"
-URL_images = "../Datasets/val_TFM/images/"
+URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_2class_YOLO/"
+URL_results = "/home/susi/Documents/Pruebas_BG/Barcelona_P2/"
+URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
 
-"""URL_ground_truth = "../Datasets/val_5/labels_YOLO/"
-URL_results = "../Datasets/validacion_semaforos/Detect_semaphore_dataset7_00006_2_3_0995_340_newclass/"
-URL_images = "../Datasets/val_5/images/" """
 
 def get_info(file, im, str):
     cl = []
@@ -54,6 +51,7 @@ def paint_detections(cl_r, pr, cl_gt, pgt, im):
         cv2.putText(im, str(cl_gt[i]), (int(g[0]) + 5, int(g[1]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 255), 2)
         i = i + 1
 
+    #im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
     cv2.imshow("compare", im)
     cv2.waitKey(0)
 
@@ -61,7 +59,7 @@ def paint_detections(cl_r, pr, cl_gt, pgt, im):
 def compare(cl_r, ps_r, cl_gt, ps_gt):
     i = 0
     cont = len(cl_gt)
-    sums = np.zeros((8, 8))
+    sums = np.zeros((3, 3))
 
     while (len(cl_r) > 0) & (len(cl_gt) > 0) & (cont > 0):
         cont = cont - 1
@@ -84,11 +82,11 @@ def compare(cl_r, ps_r, cl_gt, ps_gt):
             i = i + 1
 
     while len(cl_gt) > 0:
-        sums[7][cl_gt[0]] = sums[7][cl_gt[0]] + 1
+        sums[2][cl_gt[0]] = sums[2][cl_gt[0]] + 1
         cl_gt = np.delete(cl_gt, 0)
 
     while len(cl_r) > 0:
-        sums[cl_r[0]][6] = sums[cl_r[0]][6] + 1
+        sums[cl_r[0]][2] = sums[cl_r[0]][2] + 1
         cl_r = np.delete(cl_r, 0)
 
     return sums
@@ -98,8 +96,8 @@ def get_numbers(m, labels):
     divs = m.sum(axis=0)
     for i in range(len(labels)):
         tp = m[i][i] / divs[i]
-        fp = m[i][6] / divs[i]
-        fn = m[7][i] / divs[i]
+        fp = m[i][2] / divs[i]
+        fn = m[2][i] / divs[i]
         ta = tp / (tp + fp + fn)
         te = (fp + fn) / (tp + fp + fn)
         p = tp / (tp + fp)
@@ -115,7 +113,7 @@ def get_numbers(m, labels):
 
 
 data = os.listdir(URL_ground_truth)
-total_matrix = np.zeros((8, 8))
+total_matrix = np.zeros((3, 3))
 vis = False
 
 for d in data:
@@ -123,9 +121,6 @@ for d in data:
     results = open(os.path.join(URL_results, d))
     gt = open(os.path.join(URL_ground_truth, d))
 
-    '''if len(d.split('.')[0].split('_')) == 3:
-        img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".jpg"))
-    else:'''
     img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".png"))
 
     class_results, positions_results = get_info(results, img, "results")
@@ -142,9 +137,9 @@ plt.matshow(total_matrix)
 plt.colorbar()
 plt.xlabel("groundTruth")
 plt.ylabel("results")
-# plt.title("Detect_semaphore_dataset5_00005_2_3_0995_600")
+
 plt.show()
 
-labels = np.array(['Peaton', 'Coche'])
 #labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+labels = np.array(['Peaton', 'Coche'])
 get_numbers(total_matrix, labels)
