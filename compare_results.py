@@ -1,10 +1,10 @@
 import os
 import cv2
 
-input_URL_images = "/home/susi/Documents/Datasets/data_7/val/images/"
-input_URL_results_labels = "/home/susi/Documents/Pruebas_BG/D1_M1/"
-input_URL_gt_labels = "/home/susi/Documents/Datasets/data_7/val/2class_YOLO/"
-output_URL = "/home/susi/Documents/Datasets/resultados_P2_val2/"
+input_URL_images = "/home/susi/Documents/Datasets/data_8/val2/images/"
+input_URL_results_labels = "/home/susi/Documents/Pruebas_BG/Barcelona_P1_Val2/"
+input_URL_gt_labels = "/home/susi/Documents/Datasets/data_8/val2/labels/"
+output_URL = "/home/susi/Documents/Datasets/Barcelona_val2/"
 
 colors_gt = [(8, 186, 255), (7, 163, 250), (4, 93, 232), (2, 47, 220), (0, 0, 208), (8, 2, 157)]
 colors_results = [(244, 232, 173), (228, 202, 72), (216, 180, 0), (182, 119, 0), (138, 62, 2), (94, 4, 3)]
@@ -38,8 +38,8 @@ def paint(file, img, t):
 
 
 data = os.listdir(input_URL_gt_labels)
-save = False
-visualize = True
+save = True
+visualize = False
 
 for d in data:
     file = open(os.path.join(input_URL_results_labels, d))

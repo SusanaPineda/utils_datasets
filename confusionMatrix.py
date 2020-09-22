@@ -3,10 +3,12 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_2class_YOLO/"
-URL_results = "/home/susi/Documents/Pruebas_BG/Barcelona_P2/"
-URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
+URL_ground_truth = "/home/susi/Documents/Datasets/Alex_val/labels_YOLO_6class/"
+URL_results = "/home/susi/Documents/Pruebas_BG/D2_M2/"
+URL_images = "/home/susi/Documents/Datasets/Alex_val/images/"
 
+labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+#labels = np.array(['Peaton', 'Coche'])
 
 def get_info(file, im, str):
     cl = []
@@ -51,15 +53,15 @@ def paint_detections(cl_r, pr, cl_gt, pgt, im):
         cv2.putText(im, str(cl_gt[i]), (int(g[0]) + 5, int(g[1]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 255), 2)
         i = i + 1
 
-    #im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
+    im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
     cv2.imshow("compare", im)
     cv2.waitKey(0)
 
 
-def compare(cl_r, ps_r, cl_gt, ps_gt):
+def compare(cl_r, ps_r, cl_gt, ps_gt, d):
     i = 0
     cont = len(cl_gt)
-    sums = np.zeros((3, 3))
+    sums = np.zeros((labels.size+1, labels.size+1))
 
     while (len(cl_r) > 0) & (len(cl_gt) > 0) & (cont > 0):
         cont = cont - 1
@@ -72,7 +74,7 @@ def compare(cl_r, ps_r, cl_gt, ps_gt):
         cl_gth = cl_gt[i]
         cl_res = cl_r[dis_min]
         dist = diff[dis_min]
-        if dist < 90:
+        if dist < d:
             sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
             cl_r = np.delete(cl_r, dis_min)
             cl_gt = np.delete(cl_gt, i)
@@ -82,11 +84,11 @@ def compare(cl_r, ps_r, cl_gt, ps_gt):
             i = i + 1
 
     while len(cl_gt) > 0:
-        sums[2][cl_gt[0]] = sums[2][cl_gt[0]] + 1
+        sums[labels.size][cl_gt[0]] = sums[labels.size][cl_gt[0]] + 1
         cl_gt = np.delete(cl_gt, 0)
 
     while len(cl_r) > 0:
-        sums[cl_r[0]][2] = sums[cl_r[0]][2] + 1
+        sums[cl_r[0]][labels.size] = sums[cl_r[0]][labels.size] + 1
         cl_r = np.delete(cl_r, 0)
 
     return sums
@@ -96,8 +98,8 @@ def get_numbers(m, labels):
     divs = m.sum(axis=0)
     for i in range(len(labels)):
         tp = m[i][i] / divs[i]
-        fp = m[i][2] / divs[i]
-        fn = m[2][i] / divs[i]
+        fp = m[i][labels.size] / divs[i]
+        fn = m[labels.size][i] / divs[i]
         ta = tp / (tp + fp + fn)
         te = (fp + fn) / (tp + fp + fn)
         p = tp / (tp + fp)
@@ -112,8 +114,9 @@ def get_numbers(m, labels):
 
 
 
+
 data = os.listdir(URL_ground_truth)
-total_matrix = np.zeros((3, 3))
+total_matrix = np.zeros((labels.size+1, labels.size+1))
 vis = False
 
 for d in data:
@@ -123,13 +126,15 @@ for d in data:
 
     img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".png"))
 
+    distance = img.shape[0]/5
+
     class_results, positions_results = get_info(results, img, "results")
     class_gt, positions_gt = get_info(gt, img, "gt")
 
     if vis:
         paint_detections(class_results, positions_results, class_gt, positions_gt, img.copy())
 
-    matrix = compare(class_results.copy(), positions_results.copy(), class_gt.copy(), positions_gt.copy())
+    matrix = compare(class_results.copy(), positions_results.copy(), class_gt.copy(), positions_gt.copy(), distance)
 
     total_matrix = total_matrix + matrix
 
@@ -140,6 +145,4 @@ plt.ylabel("results")
 
 plt.show()
 
-#labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
-labels = np.array(['Peaton', 'Coche'])
 get_numbers(total_matrix, labels)

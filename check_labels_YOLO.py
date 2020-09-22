@@ -1,8 +1,8 @@
 import os
 import cv2
 
-input_URL_images = "/home/susi/Documents/Datasets/val2/images/"
-input_URL_labels = "/home/susi/Documents/Datasets/val2/2class_YOLO/"
+input_URL_images = "/home/susi/Documents/Datasets/Alex_val/images/"
+input_URL_labels = "/home/susi/Documents/Datasets/Alex_val/labels_YOLO_2class"
 
 
 def get_labels(file, img):
@@ -24,6 +24,7 @@ def get_labels(file, img):
 
         img = cv2.rectangle(img, (int(left), int(top)), (int(right), int(bottom)), (0, 255, 0), 3)
 
+    #img = cv2.resize(img, (int(img.shape[1] * 0.2), int(img.shape[0] * 0.2)))
     cv2.imshow("augment", img)
     cv2.waitKey(0)
 
