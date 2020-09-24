@@ -3,12 +3,12 @@ from PIL import Image
 import cv2
 import numpy as np
 
-input_URL_images = "/home/susi/Documents/Datasets/val2/images/"
-input_URL_labels = "/home/susi/Documents/Datasets/val2/labels/"
+input_URL_images = "/home/susi/Documents/Datasets/Alex_val/images/"
+input_URL_labels = "/home/susi/Documents/Datasets/Alex_val/labels_DIGITS_6class/"
 
 
-output_URL_images = "/home/susi/Documents/Datasets/val2_resize640/images/"
-output_URL_labels = "/home/susi/Documents/Datasets/val2_resize640/labels/"
+output_URL_images = "/home/susi/Documents/Datasets/Alex_val640/images/"
+output_URL_labels = "/home/susi/Documents/Datasets/Alex_val640/labels/"
 
 
 def update_labels(f, res, o):
@@ -30,7 +30,9 @@ def update_labels(f, res, o):
 def apply_transform(img, res):
 
     im = img.resize((640, 640))
-    #im = img.resize((int(img.width * res), int(img.height * res)))
+    #w = img.width * res[0]
+    #h = img.height * res[1]
+    #im = img.resize((int(w), int(h)))
 
     return im
 

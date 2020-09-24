@@ -2,9 +2,9 @@ import os
 import cv2
 import numpy as np
 
-URL_output = "/home/susi/Documents/Datasets/data_8/val/labels_YOLO/"
-URL_DIGITS = "/home/susi/Documents/Datasets/data_8/val/labels_DIGITS/"
-URL_IMGs = "/home/susi/Documents/Datasets/data_8/val/images/"
+URL_output = "/home/susi/Documents/Datasets/Alex_val640/labels_YOLO/"
+URL_DIGITS = "/home/susi/Documents/Datasets/Alex_val640/labels/"
+URL_IMGs = "/home/susi/Documents/Datasets/Alex_val640/images/"
 data = os.listdir(URL_DIGITS)
 
 tags = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])

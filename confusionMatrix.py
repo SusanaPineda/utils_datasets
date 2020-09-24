@@ -3,9 +3,9 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "/home/susi/Documents/Datasets/Alex_val/labels_YOLO_6class/"
-URL_results = "/home/susi/Documents/Pruebas_BG/D2_M2/"
-URL_images = "/home/susi/Documents/Datasets/Alex_val/images/"
+URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_YOLO/"
+URL_results = "/home/susi/Documents/Pruebas_BG/D5_5e-05_2_3_0995_600/"
+URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
 
 labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
 #labels = np.array(['Peaton', 'Coche'])
@@ -22,17 +22,13 @@ def get_info(file, im, str):
 
         if str == "gt":
             tag = int(text[0 + despl])
-            cn = (float(text[1 + despl]) * w, float(text[2 + despl]) * h)
-            '''left = (float(text[1+despl])*w)-(float(text[3+despl]*w)/2)
-            top = (float(text[2+despl])*h)-(float(text[4+despl]*h)/2)
-            right = (float(text[1+despl])*w)+(float(text[3+despl]*w)/2)
-            bottom = (float(text[2+despl])*h)+(float(text[4+despl]*h)/2)'''
+            cn = (float(text[2 + despl]) * h, float(text[1 + despl]) * w)
         else:
             tag = int(text[0 + despl])
-            top = float(text[1 + despl])
-            left = float(text[2 + despl])
-            width = float(text[3 + despl]) - top
-            height = float(text[4 + despl]) - left
+            left = float(text[1 + despl])
+            top = float(text[2 + despl])
+            width = float(text[3 + despl]) - left
+            height = float(text[4 + despl]) - top
             cn = (top + height / 2, left + width / 2)
 
         cl.append(tag)
@@ -44,16 +40,16 @@ def get_info(file, im, str):
 def paint_detections(cl_r, pr, cl_gt, pgt, im):
     i = 0
     for p in pr:
-        cv2.circle(im, (int(p[0]), int(p[1])), 3, (255, 0, 0), 2)
-        cv2.putText(im, str(cl_r[i]), (int(p[0]) + 5, int(p[1]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255, 0, 0), 2)
+        cv2.circle(im, (int(p[1]), int(p[0])), 3, (255, 0, 0), 2)
+        cv2.putText(im, str(cl_r[i]), (int(p[1]) + 5, int(p[0]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255, 0, 0), 2)
         i = i + 1
     i = 0
     for g in pgt:
-        cv2.circle(im, (int(g[0]), int(g[1])), 3, (0, 0, 255), 2)
-        cv2.putText(im, str(cl_gt[i]), (int(g[0]) + 5, int(g[1]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 255), 2)
+        cv2.circle(im, (int(g[1]), int(g[0])), 3, (0, 0, 255), 2)
+        cv2.putText(im, str(cl_gt[i]), (int(g[1]) + 5, int(g[0]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 255), 2)
         i = i + 1
 
-    im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
+    #im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
     cv2.imshow("compare", im)
     cv2.waitKey(0)
 
