@@ -3,12 +3,12 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_YOLO/"
-URL_results = "/home/susi/Documents/Pruebas_BG/D5_5e-05_2_3_0995_600/"
+URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_2class_YOLO/"
+URL_results = "/home/susi/Documents/Pruebas_BG/Barcelona_P3/"
 URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
 
-labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
-#labels = np.array(['Peaton', 'Coche'])
+#labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+labels = np.array(['Peaton', 'Coche'])
 
 def get_info(file, im, str):
     cl = []
@@ -49,43 +49,83 @@ def paint_detections(cl_r, pr, cl_gt, pgt, im):
         cv2.putText(im, str(cl_gt[i]), (int(g[1]) + 5, int(g[0]) + 5), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 255), 2)
         i = i + 1
 
-    #im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
+    # im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
     cv2.imshow("compare", im)
     cv2.waitKey(0)
 
 
+def check_class(m_e, cl_r, cl_gt, d):
+    m = np.zeros((len(cl_r), len(cl_gt)))
+    for y in range(len(cl_gt)):
+        for x in range(len(cl_r)):
+            m[x][y] = cl_r[x] == cl_gt[y]
+    m = np.logical_not(m)
+    m = m*d/2
+    m_e = m_e + m
+    return m_e
+
+def update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt, idx_res, idx_gt):
+    cl_gth = cl_gt[idx_gt]
+    cl_res = cl_r[idx_res]
+    sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
+    m_emp[idx_res][idx_gt] = 1
+
+    return sums, m_emp, cl_r, ps_r, cl_gt, ps_gt
+
+
 def compare(cl_r, ps_r, cl_gt, ps_gt, d):
-    i = 0
-    cont = len(cl_gt)
-    sums = np.zeros((labels.size+1, labels.size+1))
+    sums = np.zeros((labels.size + 1, labels.size + 1))
+    m_dist = np.zeros((len(cl_r), len(cl_gt)))
+    m_emp = np.zeros((len(cl_r), len(cl_gt)))
 
-    while (len(cl_r) > 0) & (len(cl_gt) > 0) & (cont > 0):
-        cont = cont - 1
-        np_pos = np.asarray(ps_gt[i])
-        # diff = np.absolute(np.subtract(ps_r, np_pos))
-        diff = [np.linalg.norm(np.asarray(x) - np_pos) for x in list(ps_r)]
-        dis_min = np.argmin(diff)
-        # dis_min = int(dis_min/2)
+    # for y, x in zip(range(len(ps_gt)), range(ps_r)):
 
-        cl_gth = cl_gt[i]
-        cl_res = cl_r[dis_min]
-        dist = diff[dis_min]
-        if dist < d:
-            sums[cl_res][cl_gth] = sums[cl_res][cl_gth] + 1
-            cl_r = np.delete(cl_r, dis_min)
-            cl_gt = np.delete(cl_gt, i)
-            ps_r = np.delete(ps_r, dis_min, 0)
-            ps_gt = np.delete(ps_gt, i, 0)
-        else:
-            i = i + 1
+    for y in range(len(ps_gt)):
+        for x in range(len(ps_r)):
+            m_dist[x][y] = np.linalg.norm(np.asarray(ps_r[x]) - np.asarray(ps_gt[y]))
 
-    while len(cl_gt) > 0:
-        sums[labels.size][cl_gt[0]] = sums[labels.size][cl_gt[0]] + 1
-        cl_gt = np.delete(cl_gt, 0)
+    if im_cls:
+        m_dist = check_class(m_dist, cl_r, cl_gt, d)
+    dis_min = np.argmin(m_dist, axis=1)
+    # dis_min[i] = np.unravel_index(a, aux.shape)
 
-    while len(cl_r) > 0:
-        sums[cl_r[0]][labels.size] = sums[cl_r[0]][labels.size] + 1
-        cl_r = np.delete(cl_r, 0)
+    uniq, indx = np.unique(dis_min, return_index=True)
+    if len(uniq) != len(cl_r):
+        for i in range(len(uniq)):
+            idx_num_det = np.where(dis_min == uniq[i])
+            if len(idx_num_det) > 1:
+                distancias = np.zeros(len(idx_num_det))
+                for dis in range(len(idx_num_det)):
+                    distancias[dis] = m_dist[uniq[i]][dis]
+                d_min = np.argmin(distancias)
+                dist = distancias[d_min]
+
+                if dist < d:
+                    sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
+                                                                          idx_num_det[d_min], uniq[i])
+
+            else:
+                dist = m_dist[indx[i]][uniq[i]]
+                if dist < d:
+                    sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
+                                                                          indx[i], uniq[i])
+
+    else:
+        for i in range(len(dis_min)):
+            dist = m_dist[i][dis_min[i]]
+            if dist < d:
+                sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
+                                                                      i, dis_min[i])
+
+    fp = np.all(m_emp == 0, axis=1)
+    for y in range(len(fp)):
+        if fp[y]:
+            sums[cl_r[y]][labels.size] = sums[cl_r[y]][labels.size] + 1
+
+    fn = np.all(m_emp == 0, axis=0)
+    for x in range(len(fn)):
+        if fn[x]:
+            sums[labels.size][cl_gt[x]] = sums[labels.size][cl_gt[x]] + 1
 
     return sums
 
@@ -109,11 +149,10 @@ def get_numbers(m, labels):
         print("\n       Tasa de precision: " + str(p))
 
 
-
-
 data = os.listdir(URL_ground_truth)
-total_matrix = np.zeros((labels.size+1, labels.size+1))
+total_matrix = np.zeros((labels.size + 1, labels.size + 1))
 vis = False
+im_cls = True
 
 for d in data:
 
@@ -122,7 +161,7 @@ for d in data:
 
     img = cv2.imread(os.path.join(URL_images, d.split('.')[0] + ".png"))
 
-    distance = img.shape[0]/5
+    distance = img.shape[0] / 5
 
     class_results, positions_results = get_info(results, img, "results")
     class_gt, positions_gt = get_info(gt, img, "gt")
