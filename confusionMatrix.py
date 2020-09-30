@@ -3,12 +3,13 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_2class_YOLO/"
-URL_results = "/home/susi/Documents/Pruebas_BG/Barcelona_P3/"
-URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
+URL_ground_truth = "/home/susi/Documents/Datasets/data_9/val/2class_labels_YOLO/"
+URL_results = "/home/susi/Documents/Pruebas_BG/Barcelona_240_5e05_0995_D2/"
+URL_images = "/home/susi/Documents/Datasets/data_9/val/images/"
 
-#labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+# labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
 labels = np.array(['Peaton', 'Coche'])
+
 
 def get_info(file, im, str):
     cl = []
@@ -60,9 +61,10 @@ def check_class(m_e, cl_r, cl_gt, d):
         for x in range(len(cl_r)):
             m[x][y] = cl_r[x] == cl_gt[y]
     m = np.logical_not(m)
-    m = m*d/2
+    m = m * d / 2
     m_e = m_e + m
     return m_e
+
 
 def update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt, idx_res, idx_gt):
     cl_gth = cl_gt[idx_gt]
@@ -80,52 +82,54 @@ def compare(cl_r, ps_r, cl_gt, ps_gt, d):
 
     # for y, x in zip(range(len(ps_gt)), range(ps_r)):
 
-    for y in range(len(ps_gt)):
-        for x in range(len(ps_r)):
-            m_dist[x][y] = np.linalg.norm(np.asarray(ps_r[x]) - np.asarray(ps_gt[y]))
+    if len(cl_gt) > 0:
+        for y in range(len(ps_gt)):
+            for x in range(len(ps_r)):
+                m_dist[x][y] = np.linalg.norm(np.asarray(ps_r[x]) - np.asarray(ps_gt[y]))
 
-    if im_cls:
-        m_dist = check_class(m_dist, cl_r, cl_gt, d)
-    dis_min = np.argmin(m_dist, axis=1)
-    # dis_min[i] = np.unravel_index(a, aux.shape)
+        if im_cls:
+            m_dist = check_class(m_dist, cl_r, cl_gt, d)
 
-    uniq, indx = np.unique(dis_min, return_index=True)
-    if len(uniq) != len(cl_r):
-        for i in range(len(uniq)):
-            idx_num_det = np.where(dis_min == uniq[i])
-            if len(idx_num_det) > 1:
-                distancias = np.zeros(len(idx_num_det))
-                for dis in range(len(idx_num_det)):
-                    distancias[dis] = m_dist[uniq[i]][dis]
-                d_min = np.argmin(distancias)
-                dist = distancias[d_min]
+        dis_min = np.argmin(m_dist, axis=1)
+        # dis_min[i] = np.unravel_index(a, aux.shape)
 
+        uniq, indx = np.unique(dis_min, return_index=True)
+        if len(uniq) != len(cl_r):
+            for i in range(len(uniq)):
+                idx_num_det = np.where(dis_min == uniq[i])
+                if len(idx_num_det) > 1:
+                    distancias = np.zeros(len(idx_num_det))
+                    for dis in range(len(idx_num_det)):
+                        distancias[dis] = m_dist[uniq[i]][dis]
+                    d_min = np.argmin(distancias)
+                    dist = distancias[d_min]
+
+                    if dist < d:
+                        sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
+                                                                              idx_num_det[d_min], uniq[i])
+
+                else:
+                    dist = m_dist[indx[i]][uniq[i]]
+                    if dist < d:
+                        sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
+                                                                              indx[i], uniq[i])
+
+        else:
+            for i in range(len(dis_min)):
+                dist = m_dist[i][dis_min[i]]
                 if dist < d:
                     sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
-                                                                          idx_num_det[d_min], uniq[i])
+                                                                          i, dis_min[i])
 
-            else:
-                dist = m_dist[indx[i]][uniq[i]]
-                if dist < d:
-                    sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
-                                                                          indx[i], uniq[i])
+        fp = np.all(m_emp == 0, axis=1)
+        for y in range(len(fp)):
+            if fp[y]:
+                sums[cl_r[y]][labels.size] = sums[cl_r[y]][labels.size] + 1
 
-    else:
-        for i in range(len(dis_min)):
-            dist = m_dist[i][dis_min[i]]
-            if dist < d:
-                sums, m_emp, cl_r, ps_r, cl_gt, ps_gt = update_matrix(sums, m_emp, cl_r, ps_r, cl_gt, ps_gt,
-                                                                      i, dis_min[i])
-
-    fp = np.all(m_emp == 0, axis=1)
-    for y in range(len(fp)):
-        if fp[y]:
-            sums[cl_r[y]][labels.size] = sums[cl_r[y]][labels.size] + 1
-
-    fn = np.all(m_emp == 0, axis=0)
-    for x in range(len(fn)):
-        if fn[x]:
-            sums[labels.size][cl_gt[x]] = sums[labels.size][cl_gt[x]] + 1
+        fn = np.all(m_emp == 0, axis=0)
+        for x in range(len(fn)):
+            if fn[x]:
+                sums[labels.size][cl_gt[x]] = sums[labels.size][cl_gt[x]] + 1
 
     return sums
 

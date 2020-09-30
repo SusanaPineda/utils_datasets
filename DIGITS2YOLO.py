@@ -2,9 +2,9 @@ import os
 import cv2
 import numpy as np
 
-URL_output = "/home/susi/Documents/Datasets/Alex_val640/labels_YOLO/"
-URL_DIGITS = "/home/susi/Documents/Datasets/Alex_val640/labels/"
-URL_IMGs = "/home/susi/Documents/Datasets/Alex_val640/images/"
+URL_output = "/home/susi/Documents/Datasets/data_9/val/labels_YOLO/"
+URL_DIGITS = "/home/susi/Documents/Datasets/data_9/val/labels/"
+URL_IMGs = "/home/susi/Documents/Datasets/data_9/val/images/"
 data = os.listdir(URL_DIGITS)
 
 tags = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
@@ -18,7 +18,7 @@ for txt in data:
     h = img.shape[0]
     w = img.shape[1]
     f = open(os.path.join(URL_DIGITS, txt))
-    out = open(os.path.join(URL_output, txt), 'w')
+    out = open(os.path.join(URL_output, txt), 'w+')
     text = f.read()
     text = text.split()
     for i in range(int(len(text) / 15)):
