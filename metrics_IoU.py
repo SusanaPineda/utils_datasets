@@ -3,14 +3,17 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-URL_ground_truth = "/home/susi/Documents/Datasets/data_8/val/labels_DIGITS/"
-URL_results = "/home/susi/Documents/Pruebas_BG/D5_5e-05_2_3_0995_600/"
-URL_images = "/home/susi/Documents/Datasets/data_8/val/images/"
+URL_ground_truth = "/media/susi/B48C43F88C43B420/Datasets/cone_det_1/val/labels/"
+URL_results = "/home/susi/Documents/DeteccionConos/MIT_results/"
+URL_images = "/media/susi/B48C43F88C43B420/Datasets/cone_det_1/val/images/"
 
-labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+output_URL = "/media/susi/B48C43F88C43B420/Datasets/cone_det_1/results/"
+
+#labels = np.array(['Peaton_verde', 'Peaton_rojo', 'Peaton_generico', 'Coche_verde', 'Coche_rojo', 'Coche_generico'])
+labels = np.array(['cone'])
 colors_gt = [(8, 186, 255), (7, 163, 250), (4, 93, 232), (2, 47, 220), (0, 0, 208), (8, 2, 157)]
 colors_results = [(244, 232, 173), (228, 202, 72), (216, 180, 0), (182, 119, 0), (138, 62, 2), (94, 4, 3)]
-threshold_iou = 0.3
+threshold_iou = 0.5
 
 
 def get_intersection_area(boxA, boxB):
@@ -79,18 +82,21 @@ def get_bbx(file, s):
 def paint_detections(cl_r, pr, cl_gt, pgt, im):
     i = 0
     for p in pr:
-        im = cv2.rectangle(im, (p[0], p[1]), (p[2], p[3]), colors_results[cl_r[i]], 5)
-        cv2.putText(im, str(cl_r[i]), (p[0], p[1]), cv2.FONT_HERSHEY_COMPLEX, 0.6, colors_results[cl_r[i]], 2)
+        im = cv2.rectangle(im, (p[0], p[1]), (p[2], p[3]), colors_results[cl_r[i]], 2)
+        #cv2.putText(im, str(cl_r[i]), (p[0], p[1]), cv2.FONT_HERSHEY_COMPLEX, 0.6, colors_results[cl_r[i]], 2)
         i = i + 1
     i = 0
     for g in pgt:
-        im = cv2.rectangle(im, (g[0], g[1]), (g[2], g[3]), colors_gt[int(cl_gt[i])], 5)
-        cv2.putText(im, str(cl_gt[i]), (g[0], g[1]), cv2.FONT_HERSHEY_COMPLEX, 0.6, colors_gt[int(cl_gt[i])], 2)
+        im = cv2.rectangle(im, (g[0], g[1]), (g[2], g[3]), colors_gt[int(cl_gt[i])], 2)
+        #cv2.putText(im, str(cl_gt[i]), (g[0], g[1]), cv2.FONT_HERSHEY_COMPLEX, 0.6, colors_gt[int(cl_gt[i])], 2)
         i = i + 1
 
-    im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
-    cv2.imshow("compare", im)
-    cv2.waitKey(0)
+    #im = cv2.resize(im, (int(im.shape[1]*0.2), int(im.shape[0]*0.2)))
+    if vis:
+        cv2.imshow("compare", im)
+        cv2.waitKey(0)
+    if save:
+        cv2.imwrite(os.path.join(output_URL, d.split('.')[0] + ".png"), im)
 
 
 def compare(cl_r, ps_r, cl_gt, ps_gt):
@@ -153,6 +159,7 @@ def get_numbers(m, labels):
 data = os.listdir(URL_ground_truth)
 total_matrix = np.zeros((labels.size + 1, labels.size + 1))
 vis = False
+save = True
 
 for d in data:
 
@@ -164,8 +171,8 @@ for d in data:
     class_results, positions_results = get_bbx(results, "results")
     class_gt, positions_gt = get_bbx(gt, "gt")
 
-    if vis:
-        paint_detections(class_results, positions_results, class_gt, positions_gt, img.copy())
+
+    paint_detections(class_results, positions_results, class_gt, positions_gt, img.copy())
 
     matrix = compare(class_results.copy(), positions_results.copy(), class_gt.copy(), positions_gt.copy())
 
