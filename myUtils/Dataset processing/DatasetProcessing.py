@@ -1,6 +1,45 @@
 import os
 import cv2
 import numpy as np
+import argparse
+from sklearn.model_selection import train_test_split
+
+"""
+Obtencion de imagenes a partir de video
+"""
+
+
+def get_frames(input_url, output_url, tag, contador):
+    cap = cv2.VideoCapture(input_url)
+    cont = 0
+    c = contador
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if ret:
+            if c == 0:
+                cv2.imshow("frame", frame)
+                name = os.path.join(output_url, tag)
+                cv2.imwrite(name + str(cont) + ".png", frame)
+                cont = cont + 1
+                c = contador
+            c = c - 1
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    cap.release()
+
+
+def select_images(input_url, output_url, contador):
+    c = contador
+    for i in range(len(input_url)):
+        data = os.listdir(input_url[i])
+        for img in data:
+            if c == 0:
+                frame = cv2.imread(os.path.join(input_url[i], img))
+                cv2.imwrite(os.path.join(output_url, img), frame)
+                c = contador
+            c = c - 1
+
 
 """
 Metodos para modificar las etiquetas del dataset
@@ -137,6 +176,11 @@ def yolo_2_digits_makesense(url_output, url_yolo, url_imgs, tags):
         out.close()
 
 
+"""
+Metodos para contar el numero de clases en un dataset
+"""
+
+
 def count_class(url_labels, url_output, tags, d):
     """
     Conteo del numero de detecciones de cada clase presentes en uno o varios directorios de etiquetas.
@@ -168,3 +212,60 @@ def count_class(url_labels, url_output, tags, d):
     out.close()
 
     print("finish")
+
+
+"""
+Division del dataset
+"""
+
+
+def copy_data(images_url, labels_url, tr, output_images_url, output_labels_url):
+    img = cv2.imread(os.path.join(images_url, tr.split('.')[0] + '.png'))
+
+    if img is None:
+        img = cv2.imread(os.path.join(images_url, tr.split('.')[0] + '.jpg'))
+    cv2.imwrite(os.path.join(output_images_url, tr.split('.')[0] + '.png'), img)
+
+    if os.path.exists(os.path.join(labels_url, tr.split('.')[0] + '.txt')):
+        f = open(os.path.join(labels_url, tr.split('.')[0] + '.txt'))
+    else:
+        f = open(os.path.join(labels_url, tr.split('.')[0] + '.txt'), 'w+')
+
+    out = open(os.path.join(output_labels_url, tr.split('.')[0] + '.txt'), 'w')
+    text = f.read()
+    out.write(text)
+    f.close()
+    out.close()
+
+
+def divide_data(images_url, labels_url, test_images_url, test_labels_url, train_images_url, train_labels_url,
+                test_size):
+    data = os.listdir(images_url)
+
+    train, test = train_test_split(data, test_size=test_size, random_state=23)
+
+    for tr in train:
+        copy_data(images_url, labels_url, tr, train_images_url, train_labels_url)
+
+    for te in test:
+        copy_data(images_url, labels_url, te, test_images_url, test_labels_url)
+
+
+def divide_data_concrete(images_url, labels_url, test_images_url, test_labels_url, train_images_url, train_labels_url,
+                         val_images_url, val_labels_url, val_tag, test_size):
+    data = os.listdir(images_url)
+    tt = []
+
+    for d in data:
+        if d.split('_')[0] == val_tag:
+            copy_data(images_url, labels_url, d, val_images_url, val_labels_url)
+        else:
+            tt.append(d)
+
+    train, test = train_test_split(tt, test_size=test_size, random_state=23)
+
+    for tr in train:
+        copy_data(images_url, labels_url, tr, train_images_url, train_labels_url)
+
+    for te in test:
+        copy_data(images_url, labels_url, te, test_images_url, test_labels_url)
